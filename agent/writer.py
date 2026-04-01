@@ -1,12 +1,13 @@
 import json
 import logging
 import requests
-from anthropic import Anthropic
+import anthropic
 
+from agent.exceptions import LowCreditsError
 from agent.models import ScoredArticle, SelectedArticles, Newsletter
 
 logger = logging.getLogger(__name__)
-client = Anthropic()
+client = anthropic.Anthropic()
 
 SYSTEM_PROMPT = """\
 You are a skilled newsletter writer. Write in a clear, engaging, and conversational tone — informed but never dry.
@@ -108,12 +109,17 @@ Write the newsletter now. Return JSON matching this schema:
 {schema}
 """
 
-    response = client.messages.create(
-        model="claude-sonnet-4-5",
-        max_tokens=6000,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_message}],
-    )
+    try:
+        response = client.messages.create(
+            model="claude-sonnet-4-5",
+            max_tokens=6000,
+            system=SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": user_message}],
+        )
+    except anthropic.APIStatusError as e:
+        if "credit balance" in str(e).lower():
+            raise LowCreditsError() from e
+        raise
 
     raw = response.content[0].text.strip()
     if raw.startswith("```"):

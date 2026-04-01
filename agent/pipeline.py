@@ -12,6 +12,7 @@ from collections import defaultdict
 
 from db import database
 from agent import fetcher, deduplicator, scorer, selector, writer, delivery, discoverer
+from agent.exceptions import LowCreditsError
 
 logging.basicConfig(
     level=logging.INFO,
@@ -31,10 +32,23 @@ def load_config() -> dict:
 def run(dry_run: bool = False):
     logger.info("=== Newsletter Agent Starting%s ===", " (DRY RUN)" if dry_run else "")
 
-    # Initialize DB
     database.initialize()
-
     cfg = load_config()
+    del_cfg = cfg["delivery"]
+
+    try:
+        _run(dry_run, cfg)
+    except LowCreditsError:
+        logger.error("Anthropic credits exhausted — sending alert and exiting")
+        delivery.send_low_credits_alert(
+            recipient_email=del_cfg.get("recipient_email") or None,
+            sender_email=del_cfg.get("sender_email") or None,
+            sender_name=del_cfg.get("sender_name", "Newsletter Agent"),
+        )
+        sys.exit(1)
+
+
+def _run(dry_run: bool, cfg: dict):
     nl_cfg = cfg["newsletter"]
     del_cfg = cfg["delivery"]
     disc_cfg = cfg.get("discovery", {})

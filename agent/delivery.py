@@ -127,6 +127,51 @@ def send_email(
         return False
 
 
+def send_low_credits_alert(
+    recipient_email: str | None = None,
+    sender_email: str | None = None,
+    sender_name: str = "Newsletter Agent",
+) -> bool:
+    """Send a plain-text alert email when Anthropic credits are exhausted."""
+    try:
+        import resend  # type: ignore
+
+        api_key = os.environ.get("RESEND_API_KEY")
+        if not api_key:
+            logger.error("RESEND_API_KEY not set — cannot send low-credits alert")
+            return False
+
+        resend.api_key = api_key
+
+        to = recipient_email or os.environ.get("RECIPIENT_EMAIL")
+        from_addr = sender_email or os.environ.get("SENDER_EMAIL")
+
+        if not to or not from_addr:
+            logger.error("Recipient or sender email not configured — cannot send low-credits alert")
+            return False
+
+        params = {
+            "from": f"{sender_name} <{from_addr}>",
+            "to": [to],
+            "subject": "⚠️ Newsletter Agent: Anthropic credits exhausted",
+            "html": (
+                "<p>Hi,</p>"
+                "<p>Your weekly newsletter could not be generated because your <strong>Anthropic API credits are exhausted</strong>.</p>"
+                "<p>Please top up your balance at "
+                "<a href='https://console.anthropic.com/'>console.anthropic.com</a> → Plans &amp; Billing.</p>"
+                "<p>The newsletter will run automatically on the next scheduled cycle once credits are restored.</p>"
+                "<p>— Newsletter Agent</p>"
+            ),
+        }
+        resend.Emails.send(params)
+        logger.info("Low-credits alert sent to %s", to)
+        return True
+
+    except Exception as e:
+        logger.error("Failed to send low-credits alert: %s", e)
+        return False
+
+
 def deliver(
     newsletter: Newsletter,
     method: str = "email",

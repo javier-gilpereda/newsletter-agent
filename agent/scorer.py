@@ -1,12 +1,13 @@
 import json
 import logging
 import re
-from anthropic import Anthropic
+import anthropic
 
+from agent.exceptions import LowCreditsError
 from agent.models import RawArticle, ArticleScore, ArticleScoreList, ScoredArticle
 
 logger = logging.getLogger(__name__)
-client = Anthropic()
+client = anthropic.Anthropic()
 
 SYSTEM_PROMPT = """\
 You are a news relevance analyst. You receive a list of articles and a set of user interest topics.
@@ -127,6 +128,10 @@ Return JSON: {{"scores": [{{"url_hash": "...", "relevance_score": 0.0, "topic_ta
 
             logger.info("Scored batch %d-%d: %d relevant", i, i + len(batch), len(all_scored))
 
+        except anthropic.APIStatusError as e:
+            if "credit balance" in str(e).lower():
+                raise LowCreditsError() from e
+            logger.error("Scoring batch %d failed: %s", i, e)
         except Exception as e:
             logger.error("Scoring batch %d failed: %s", i, e)
 
