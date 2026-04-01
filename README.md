@@ -89,4 +89,4 @@ newsletters/    Past newsletters as markdown files
 
 ## Cost
 
-~$0.03/newsletter in Claude API costs. Everything else on free tiers. ~$1.50/year total.
+~$0.23/newsletter in Claude API costs. Everything else on free tiers. ~$12.00/year total.
