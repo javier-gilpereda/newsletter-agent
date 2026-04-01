@@ -112,7 +112,7 @@ Write the newsletter now. Return JSON matching this schema:
     try:
         response = client.messages.create(
             model="claude-sonnet-4-5",
-            max_tokens=6000,
+            max_tokens=8192,
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_message}],
         )
@@ -132,7 +132,7 @@ Write the newsletter now. Return JSON matching this schema:
         logger.warning("Newsletter over word limit (%d words), requesting trim", newsletter.estimated_word_count)
         trim_response = client.messages.create(
             model="claude-sonnet-4-5",
-            max_tokens=6000,
+            max_tokens=8192,
             system=SYSTEM_PROMPT,
             messages=[
                 {"role": "user", "content": user_message},
