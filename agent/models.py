@@ -29,6 +29,7 @@ class ScoredArticle:
 class SelectedArticles:
     deep_dives: list[ScoredArticle]
     summaries: list[ScoredArticle]
+    quick_links: list[ScoredArticle]
 
 
 # ── Claude structured output models (Pydantic) ──────────────────────────────
@@ -61,10 +62,19 @@ class Summary(BaseModel):
     url: str
 
 
+class QuickLink(BaseModel):
+    url_hash: str
+    title: str
+    description: str   # one sentence, ~20 words
+    source_name: str
+    url: str
+
+
 class Newsletter(BaseModel):
     subject_line: str
     intro_paragraph: str
     deep_dives: list[DeepDive]
     summaries: list[Summary]
+    quick_links: list[QuickLink]
     outro: str
     estimated_word_count: int

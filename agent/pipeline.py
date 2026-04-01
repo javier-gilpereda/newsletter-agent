@@ -73,6 +73,7 @@ def run(dry_run: bool = False):
         scored_articles,
         deep_dive_count=nl_cfg.get("deep_dive_count", 3),
         summary_count=nl_cfg.get("summary_count", 10),
+        quick_link_count=nl_cfg.get("quick_link_count", 8),
         max_per_topic=nl_cfg.get("max_topic_per_section", 2),
     )
 
@@ -102,7 +103,7 @@ def run(dry_run: bool = False):
     topics_snapshot = json.dumps(topics)
     run_id = database.create_run(topics_snapshot)
 
-    all_used = selected.deep_dives + selected.summaries
+    all_used = selected.deep_dives + selected.summaries + selected.quick_links
     used_hashes = [a.raw.url_hash for a in all_used]
     score_map = {a.raw.url_hash: a.relevance_score for a in all_used}
 

@@ -3,6 +3,7 @@ name = "My Weekly Digest"
 max_words = 2100
 deep_dive_count = 3
 summary_count = 10
+quick_link_count = 8
 max_topic_per_section = 2   # diversity: max articles per topic in summary section
 lookback_days = 8            # fetch articles published in the last N days
 

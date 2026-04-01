@@ -49,6 +49,12 @@ def to_markdown(newsletter: Newsletter, newsletter_name: str = "Weekly Digest") 
                 "",
             ]
 
+    if newsletter.quick_links:
+        lines += ["---", "", "## Worth a Click", ""]
+        for q in newsletter.quick_links:
+            lines += [f"- **[{q.title}]({q.url})** ({q.source_name}) — {q.description}"]
+        lines += [""]
+
     lines += ["---", "", newsletter.outro]
     return "\n".join(lines)
 
@@ -64,6 +70,7 @@ def to_html(newsletter: Newsletter, newsletter_name: str = "Weekly Digest") -> s
         intro_paragraph=newsletter.intro_paragraph,
         deep_dives=newsletter.deep_dives,
         summaries=newsletter.summaries,
+        quick_links=newsletter.quick_links,
         outro=newsletter.outro,
     )
 

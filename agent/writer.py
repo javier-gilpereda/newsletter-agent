@@ -13,10 +13,11 @@ You are a skilled newsletter writer. Write in a clear, engaging, and conversatio
 
 Format rules:
 - Deep dives: ~300 words each. Structure: brief context, what happened/is happening, why it matters.
-- Summaries: ~80 words each. One tight, informative paragraph. End with a natural link mention.
+- Summaries: ~80 words each. One tight, informative paragraph.
+- Quick links: exactly one sentence (~20 words). Just the core idea — no fluff.
 - Intro: 2–3 sentences welcoming the reader to this week's edition.
 - Outro: 2–3 sentences signing off warmly.
-- Stay within the estimated_word_count you report — target under 2,100 words total.
+- Stay within the estimated_word_count you report — target under 2,300 words total.
 
 Return ONLY valid JSON matching the Newsletter schema. No markdown code fences, no extra text.
 """
@@ -65,6 +66,17 @@ def write(selected: SelectedArticles, topics: list[str]) -> Newsletter:
         for a in selected.summaries
     ]
 
+    quick_link_texts = [
+        {
+            "url_hash": a.raw.url_hash,
+            "title": a.raw.title,
+            "source": a.raw.source_name,
+            "url": a.raw.url,
+            "snippet": a.raw.snippet[:150],
+        }
+        for a in selected.quick_links
+    ]
+
     schema = """{
   "subject_line": "string",
   "intro_paragraph": "string",
@@ -73,6 +85,9 @@ def write(selected: SelectedArticles, topics: list[str]) -> Newsletter:
   ],
   "summaries": [
     {"url_hash": "string", "title": "string", "body": "string", "source_name": "string", "url": "string"}
+  ],
+  "quick_links": [
+    {"url_hash": "string", "title": "string", "description": "string", "source_name": "string", "url": "string"}
   ],
   "outro": "string",
   "estimated_word_count": 0
@@ -85,6 +100,9 @@ def write(selected: SelectedArticles, topics: list[str]) -> Newsletter:
 
 === SUMMARIES (write ~80 words each) ===
 {json.dumps(summary_texts, indent=2)}
+
+=== QUICK LINKS (one sentence each, ~20 words) ===
+{json.dumps(quick_link_texts, indent=2)}
 
 Write the newsletter now. Return JSON matching this schema:
 {schema}
@@ -121,6 +139,6 @@ Write the newsletter now. Return JSON matching this schema:
             raw2 = "\n".join(raw2.split("\n")[1:-1])
         newsletter = Newsletter.model_validate_json(raw2)
 
-    logger.info("Newsletter generated: %d words, %d deep dives, %d summaries",
-                newsletter.estimated_word_count, len(newsletter.deep_dives), len(newsletter.summaries))
+    logger.info("Newsletter generated: %d words, %d deep dives, %d summaries, %d quick links",
+                newsletter.estimated_word_count, len(newsletter.deep_dives), len(newsletter.summaries), len(newsletter.quick_links))
     return newsletter

@@ -25,6 +25,12 @@
   .summary:last-child { border-bottom: none; }
   .summary h3 { font-size: 16px; color: #1a1a2e; margin: 0 0 8px; line-height: 1.35; }
   .summary p { font-size: 14px; color: #444; line-height: 1.65; margin: 0 0 6px; }
+  .quick-links-section { margin-top: 8px; }
+  .quick-links-section ul { margin: 0; padding: 0 0 0 18px; }
+  .quick-links-section li { font-size: 13px; color: #444; line-height: 1.7; margin-bottom: 6px; font-family: Arial, sans-serif; }
+  .quick-links-section li a { color: #1a1a2e; font-weight: 600; text-decoration: none; }
+  .quick-links-section li a:hover { text-decoration: underline; }
+  .quick-links-section .ql-source { color: #888; font-size: 11px; }
   .outro { font-size: 14px; color: #666; line-height: 1.7; margin-top: 32px; padding-top: 24px; border-top: 1px solid #f0f0e8; }
   .footer { background: #f5f5f0; padding: 20px 40px; font-family: Arial, sans-serif; font-size: 11px; color: #999; text-align: center; }
 </style>
@@ -61,6 +67,18 @@
       <div class="source-link"><a href="{{ item.url }}">{{ item.source_name }}</a></div>
     </div>
     {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if quick_links %}
+    <hr class="divider">
+    <div class="section-label">Worth a Click</div>
+    <div class="quick-links-section">
+      <ul>
+      {% for q in quick_links %}
+        <li><a href="{{ q.url }}">{{ q.title }}</a> <span class="ql-source">({{ q.source_name }})</span> — {{ q.description }}</li>
+      {% endfor %}
+      </ul>
     </div>
     {% endif %}
 
