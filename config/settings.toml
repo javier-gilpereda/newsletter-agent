@@ -1,0 +1,21 @@
+[newsletter]
+name = "My Weekly Digest"
+max_words = 2100
+deep_dive_count = 3
+summary_count = 10
+max_topic_per_section = 2   # diversity: max articles per topic in summary section
+lookback_days = 8            # fetch articles published in the last N days
+
+[delivery]
+method = "email"             # "email" or "file"
+recipient_email = ""         # set your email here or via RECIPIENT_EMAIL env var
+sender_name = "Newsletter Agent"
+sender_email = ""            # set your verified Resend sender address or via SENDER_EMAIL env var
+
+[schedule]
+# Used only for documentation; actual schedule is in .github/workflows/newsletter.yml
+cron = "0 8 * * 1"          # Every Monday at 8am UTC
+
+[discovery]
+enabled = true
+run_every_n_weeks = 4        # run source discovery every N newsletter runs
